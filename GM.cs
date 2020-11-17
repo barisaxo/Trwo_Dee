@@ -6,14 +6,14 @@
  * https://youtu.be/xW8skO7MFYw
  * 
  * 
- * I have addapted it to C#, and I'm using the Unity engine.
+ * I have adapted it to C#, and I'm using the Unity engine.
  * However this time, the philosphy of the project remains true to OLC's 3D engine. 
- * Which I believe is: given a completely 2D display:
- * a grid based display of objects as pixels (I'm using small gameobject-sprites),
- * map out the world around you via vectors, and then draw the screen every frame,
+ * Which I believe is to say: given a completely 2D display, or a grid based display,
+ * objects of some sort would act as pixels (I'm using gameobjects with small square white sprites),
+ * map out the 3D world around you via vectors, and then draw the screen every frame,
  * performing calculations based on positions, angles, distances etc.
  * 
- * This is my first project really stepping out side of the unity editor as much as I can.
+ * This is my first project really stepping out side of the unity engine as much as I can.
  * This is also my first time experimenting using multiple classes within a single component.
  * 
  */
@@ -66,7 +66,7 @@ namespace Wolfen_Trwo_Dee
         void Update()
         {
             /* Update/calculate the FPS.
-             * Check for user input, and control our player character.
+             * Check for user input, and control the player character.
              * Call the TrwoDeeEngineUpdate every frame. */
 
             fps.text = FPS();
@@ -83,22 +83,25 @@ namespace Wolfen_Trwo_Dee
         }
     }
 
+
+
+
     public class TrwoDeeEngine
     {
-        /* Set the screen resolution and the map size. */
+        /* Set the 'pixel' resolution and the map size. */
         public static int nScreenWidth = 160;
         public static int nScreenHeight = 90;
-        public static int nMapHeight = 16;
-        public static int nMapWidth = 32;
+        public static int nMapHeight = 32;
+        public static int nMapWidth = 64;
 
-        /* Give our player some variables to controll movement etc. */
+        /* Give the player some variables to controll movement etc. */
         public static float fPlayerX = 8;/* Players X position. */
         public static float fPlayerY = 8;/* Players Y position. */
         public static float fPlayerA = 0;/* Direction the player is facing */
         public static float fFOV = 1f; /* Players field-of-view. */
-        public static float fDepth = 32; /* Default max ray distance. */
-        public static float fPlayerMoveSpeed = 7.5f; /* Players movement speed */
-        public static float fPlayerTurnSpeed = 3.5f; /* Players turn speed */
+        public static float fDepth = Mathf.Sqrt(nMapWidth * nMapWidth) + (nMapHeight * nMapHeight); /* Default max ray distance. */
+        public static float fPlayerMoveSpeed = 7.5f; /* Players movement speed. */
+        public static float fPlayerTurnSpeed = 3.5f; /* Players turn speed. */
 
         /* The map. */
         public static string map1;
@@ -106,11 +109,11 @@ namespace Wolfen_Trwo_Dee
         /* The sprite to be used as screen pixles. */
         public static Sprite sprite;
 
-        /* Cycle through this list of sprite renderers to update our 'pixels' every frame update. */
+        /* Cycle through this list of sprite renderers to update the 'pixels' every frame update. */
         public static List<SpriteRenderer> gridSR = new List<SpriteRenderer>();
 
-        /* A parent object to hold and parent the sprite-pixel game object,
-         * to keep the hierarchy clean. */
+        /* A parent object to parent the sprite-pixel game object,
+         * and to keep the hierarchy clean. */
         public static GameObject board;
 
         public static void SetUpMap()
@@ -118,26 +121,43 @@ namespace Wolfen_Trwo_Dee
             /* Load in the sprite asset */
             sprite = Resources.Load<Sprite>("ART/white");
 
-            /* A programmer friendly visual repressentation of our map.
+            /* A programmer friendly visual repressentation of the map.
              * May be easily eddited, but if the X or Y change bounds, 
-             * make sure to adjust nMapWidth & nMapHeight accordingly. */
-            /////////0123456789ABCDEF1123456789ABCDEF
-            map1 += "################################";//0
-            map1 += "#..............................#";//1
-            map1 += "#..............................#";//2
-            map1 += "#..............................#";//3
-            map1 += "##############.................#";//4
-            map1 += "#............#.................#";//5
-            map1 += "#............#.................#";//6
-            map1 += "#............#.................#";//7
-            map1 += "#............#.................#";//8
-            map1 += "#............#.................#";//9
-            map1 += "#............#.................#";//A
-            map1 += "#............#.................#";//B
-            map1 += "#..............................#";//C
-            map1 += "#......#.............#.........#";//D
-            map1 += "#..............................#";//E
-            map1 += "################################";//F
+             * make sure to adjust nMapWidth & nMapHeight accordingly.
+             * Also note that the grid X&Y is skewed, it looks taller than it should. */
+            /////////0123456789ABCDEF1123456789ABCDEF2123456789ABCDEF3123456789ABCDEF
+            map1 += "################################################################";//0
+            map1 += "#..............................................................#";//1
+            map1 += "#..............................................................#";//2
+            map1 += "#..............................................................#";//3
+            map1 += "#..............................................................#";//4
+            map1 += "#..............................................................#";//5
+            map1 += "#..............................................................#";//6
+            map1 += "#...............................#..............................#";//7
+            map1 += "#..............................................................#";//8
+            map1 += "#..............................................................#";//9
+            map1 += "#..............................................................#";//A
+            map1 += "#..............................................................#";//B
+            map1 += "#..............................................................#";//C
+            map1 += "#..............................................................#";//D
+            map1 += "#..............................................................#";//E
+            map1 += "#.......#.......#.......#.......#.......#.......#.......#......#";//F
+            map1 += "#..............................................................#";//1
+            map1 += "#..............................................................#";//1
+            map1 += "#..............................................................#";//2
+            map1 += "#..............................................................#";//3
+            map1 += "#..............................................................#";//4
+            map1 += "#..............................................................#";//5
+            map1 += "#..............................................................#";//6
+            map1 += "#...............................#..............................#";//7
+            map1 += "#..............................................................#";//8
+            map1 += "#..............................................................#";//9
+            map1 += "#..............................................................#";//A
+            map1 += "#..............................................................#";//B
+            map1 += "#..............................................................#";//C
+            map1 += "#..............................................................#";//D
+            map1 += "#..............................................................#";//E
+            map1 += "################################################################";//F
 
             /* Create the board. */
             board = new GameObject("Board");
@@ -145,8 +165,8 @@ namespace Wolfen_Trwo_Dee
             for (int x = 0; x < nScreenWidth; x++)
             {
                 for (int y = 0; y < nScreenHeight; y++)
-                {/* Instantiate, designate, and position our sprite-pixel game objects, 
-                  * then add them to our list. */
+                {/* Instantiate, designate, and position the 'pixels' sprite-gameobjects, 
+                  * then add them to the list. */
                     GameObject g = new GameObject("Grid X:" + x + ", Y: " + y);
                     g.transform.SetParent(board.transform);
                     g.transform.position = new Vector3(x, y, 0);
@@ -289,22 +309,22 @@ namespace Wolfen_Trwo_Dee
                 int nFloor = nScreenHeight - nCeiling;
 
                 for (int y = 0; y < nScreenHeight; y++)
-                {
-                    if (y + 15 <= nCeiling)
+                { /* Ready to color the 'pixels'! */
+                    if (y + 25 <= nCeiling)
                     {/* Designate as a ceiling pixel, and color/gradient accordingly. */
-                        float r = .45f - (y * y * .000374f);
-                        float g = .55f - (y * y * .000395f);
-                        float b = .55f - (y * y * .000392f); ;
+                        float r = .45f - (y * y * .0008374f);
+                        float g = .55f - (y * y * .0008395f);
+                        float b = .55f - (y * y * .0008392f);
 
                         gridSR[x * nScreenHeight + y].color = new Color(r, g, b, 1);
                     }
 
-                    else if (y + 15 >= nCeiling && y - 5 <= +nFloor)
+                    else if (y + 25 >= nCeiling && y + 0 <= +nFloor)
                     {/* Designate as a wall pixel, and color/gradient accordingly
                       * Also change the height of the walls. */
-                        float r = .75f - (fDistToWall * .04512f);
-                        float g = .85f - (fDistToWall * .04517f);
-                        float b = .75f - (fDistToWall * .04517f);
+                        float r = .75f - (fDistToWall * .024512f);
+                        float g = .85f - (fDistToWall * .024517f);
+                        float b = .75f - (fDistToWall * .024517f);
 
                         gridSR[x * nScreenHeight + y].color = new Color(r, g, b, 1);
 
@@ -319,9 +339,9 @@ namespace Wolfen_Trwo_Dee
 
                     else
                     {/* Designate as a floor pixel, and color/gradient accordingly. */
-                        float r = .0075f + (y * y * .000094f);
-                        float g = .0075f + (y * y * .000095f);
-                        float b = .0065f + (y * y * .000072f);
+                        float r = .000075f + (y * y * y * .00000029894f);
+                        float g = .000075f + (y * y * y * .00000029895f);
+                        float b = .000065f + (y * y * y * .00000028872f);
                         gridSR[x * nScreenHeight + y].color = new Color(r, g, b, 1);
                     }
                 }
